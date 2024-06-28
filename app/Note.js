@@ -9,8 +9,8 @@ export default function Note (props) {
     return (
         <ThemedView style={styles.container}>
             <ThemedView style={styles.containerNota}>
-                <ThemedText style={styles.containerNota.titolo}>{note.noteTitle}</ThemedText>
-                <ThemedText style={styles.containerNota.testo}>{note.noteText}</ThemedText>
+                <ThemedText style={styles.containerNota.titolo}>{note.titolo}</ThemedText>
+                <ThemedText style={styles.containerNota.testo}>{note.testo}</ThemedText>
             </ThemedView>
             <TouchableOpacity style={styles.tornaIndietro} onPress={() => props.navigation.navigate('Home')}>
                 <ThemedText style={styles.tornaIndietro.testo}>Torna indietro</ThemedText>

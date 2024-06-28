@@ -10,10 +10,6 @@ export default function Footer() {
 
     return (
         <ThemedView style={styles.footer}>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.contenitore}>
-                <Icon name='home' size={30} color='#000' />
-                <ThemedText style={styles.text}>Login</ThemedText>
-            </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.contenitore}>
                 <Icon name='home' size={30} color='#000' />
                 <ThemedText style={styles.text}>home</ThemedText>

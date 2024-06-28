@@ -12,30 +12,46 @@ export default function Home(props) {
         props.navigation.navigate('Note')
     }
 
-    return (
-        <ScrollView>
+    // Converti l'oggetto allNotes in un array e poi ordina le note
+    const notesArray = Object.values(allNotes).sort((a, b) => {
+        return b.data - a.data; // Ordine decrescente: dalla più recente alla più vecchia
+    });
 
-     
-        <ThemedView style={styles.container}>
-            <ThemedView style={styles.container.bloccoDiTesto}>
-                <ThemedText style={styles.container.bloccoDiTesto.titolo}>Benvenuti nella home</ThemedText>
-                <ThemedText style={styles.container.bloccoDiTesto.paragrafo}>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.</ThemedText>
-            </ThemedView>
-            { allNotes?.map((nota, index) => (
-                <ThemedView style={styles.containerNota} key={index}>
-                    <TouchableOpacity onPress={() => handlePress(nota)}>
-                        <ThemedText style={styles.containerNota.titolo}>{nota.noteTitle}</ThemedText>
-                        <ThemedText style={styles.containerNota.testo}>{nota.noteText}</ThemedText>
-                    </TouchableOpacity>
-                 
-                </ThemedView>
-            ))}
-        </ThemedView>
-        </ScrollView>
+    return (
+        <>
+          {notesArray.length > 0 ? (
+                    <ScrollView style={styles.scroll}>
+                           <ThemedView style={styles.container}>
+                           { notesArray.map((nota, index) => (
+                                <ThemedView style={styles.containerNota} key={index}>
+                                    <TouchableOpacity onPress={() => handlePress(nota)}>
+                                        <ThemedText style={styles.containerNota.titolo}>{nota.titolo}</ThemedText>
+                                        <ThemedText style={styles.containerNota.testo}>{nota.testo}</ThemedText>
+                                    </TouchableOpacity>
+                                </ThemedView>
+                            )) }
+                            </ThemedView>
+                    </ScrollView>
+                    ) : (
+                        <ThemedView style={styles.centro}>
+                                <ThemedText>Nessuna nota</ThemedText>
+                        </ThemedView>
+                )
+            }
+        </>
     )
 }
 
 const styles = StyleSheet.create({
+    centro: {
+        flex:1,
+        justifyContent:'center',
+        alignItems: 'center',
+    },
+    scroll: {
+        flex:1,
+         backgroundColor:'white',
+    },
     container: {
         flex: 1,
         alignItems: 'center',

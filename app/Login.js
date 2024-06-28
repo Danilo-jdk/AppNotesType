@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
+import { StyleSheet, TouchableOpacity, TextInput, Alert, TouchableWithoutFeedback, Keyboard, } from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { auth } from "./firebase";
@@ -9,12 +9,14 @@ import { getDatabase, ref, set} from 'firebase/database';
 import { Ionicons } from "@expo/vector-icons";
 
 
-export default function Login() {
+export default function Login({ StatiGlobali }) {
     const [nome, setNome] = useState("");
     const [cognome, setCognome] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [ripetiPassword, setRipetiPassword] = useState("");
+
+    const { setUserLoaded } = StatiGlobali;
 
     const [registrazione, setRegistrazione] = useState(false);
 
@@ -41,10 +43,18 @@ export default function Login() {
                 set(ref(db, 'users/'+ credenzialiUtente.user.uid), {
                     nome: nome,
                     cognome: cognome,
-                    email: email
+                    email: email,
+                    notes: {
+                        "abc" : {
+                            id: "abc",
+                            titolo: "Nota di cortesia",
+                            testo: " Questa è una nota di cortesia. Per modificare una nota, clicca sulla matita in alto a dx, per eliminare la nota, clicca sull'icona del cestino, per inserire una nuova nota, clicca sul pulsante in basso 'crea nota'"
+                        }
+                    }
                 })
                     .then((resp) => {
-                        console.log('dati utente salvati con successo', resp)
+                        console.log('dati utente salvati con successo', resp);
+                        setUserLoaded(true);
                     })
                     .catch ((error) => {
                         console.error('errore nel salvataggio', error)
@@ -53,6 +63,7 @@ export default function Login() {
                 console.log("account creato");
                 const user = credenzialiUtente.user;
                 console.log("nuovo utente: ", user);
+                handleSignIn(); // Effettua automaticamente il login dopo la registrazione
             })
             .catch ((error) => {
                 console.error('errore nel auth', error);
@@ -98,10 +109,15 @@ export default function Login() {
             console.log('pulsante disabilitato a causa di errori');
             setIsButtonEnabled(false)
         }
-    }, [nome, cognome, email, password, ripetiPassword])
+    }, [nome, cognome, email, password, ripetiPassword]);
+
+    const dismissKeyboard = () => {
+        Keyboard.dismiss();
+      };
 
     return (
         <ThemedView style={styles.container}>
+             <TouchableWithoutFeedback onPress={dismissKeyboard}>
              <ThemedView  style={styles.containerInput}>
                  {registrazione && (
                     <>
@@ -172,6 +188,8 @@ export default function Login() {
                     </>
                 )}
                 </ThemedView>
+             </TouchableWithoutFeedback>
+             
         </ThemedView>
     )
 }
