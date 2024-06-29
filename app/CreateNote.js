@@ -2,12 +2,39 @@ import React, {useState, useEffect} from "react";
 import { StyleSheet, TouchableOpacity, TextInput } from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { getDatabase, ref, set, push } from "firebase/database";
 
 export default function CreateNote (props) {
-    const { note } = props.StatiGlobali;
+    const { note, userId, prendiNote } = props.StatiGlobali;
 
     const [titolo, setTitolo] = useState('');
     const [testo, setTesto] = useState('');
+
+    const saveNote = async () => {
+        try {
+            const db = getDatabase();
+            const notesRef = ref(db, 'users/' + userId + '/notes');
+
+            const newNotesRef = push(notesRef);
+            const body = {
+                id:newNotesRef.key.toString(),
+                titolo: titolo,
+                testo: testo,
+                data: Date.now()
+            };
+            set(newNotesRef, body )
+                .then(() => {
+                    console.log('dati della nota salvati');
+                    prendiNote();
+                    props.navigation.navigate('Home');
+                })
+            .catch((error) => {
+                console.log("errore nella creazione della nota nel db: ", error)
+            })
+        } catch (error) {
+            console.log("errore salvataggio: ", error)
+        }
+    }
 
     return (
         <ThemedView style={styles.container}>
@@ -26,7 +53,7 @@ export default function CreateNote (props) {
                     onChangeText={setTesto}
                     multiline={true}
                 />
-                <TouchableOpacity style={styles.btn}>
+                <TouchableOpacity style={styles.btn} onPress={saveNote}>
                     <ThemedText style={styles.btn.testo}>INSERISCI NOTA</ThemedText>
                 </TouchableOpacity>
             </ThemedView>

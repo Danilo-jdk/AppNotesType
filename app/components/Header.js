@@ -7,7 +7,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { getDatabase, ref, get } from "firebase/database";
 import { Ionicons } from "@expo/vector-icons";
 
-import LogoutModal from '../components/LogoutModal';
+import CustomModal from './CustomModal';
 
 export default function Header({StatiGlobali}) {
     const logo = '../../assets/images/logo_app_notes.png';
@@ -80,7 +80,7 @@ export default function Header({StatiGlobali}) {
                     <Ionicons name="exit-outline" size={32} color='black' />
                 </TouchableOpacity>
             </ThemedView>
-            <LogoutModal 
+            <CustomModal 
             isVisible={modalVisible}
             onConfirm={confirmLogout}
             onCancel={() => setModalVisible(false)} />

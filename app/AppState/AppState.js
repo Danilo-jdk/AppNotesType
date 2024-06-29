@@ -9,6 +9,8 @@ import { getDatabase, ref, get } from "firebase/database";
 export default function AppState() {
     const [allNotes, setAllNotes] = useState([]);
     const [userLoaded, setUserLoaded] = useState(false);
+    const [userId, setUserId] = useState(null);
+    const [note, setNote] = useState([]);
 
     const prendiNote = () => {
         const db = getDatabase();
@@ -18,10 +20,9 @@ export default function AppState() {
         get(userRef).then((snapshot) => {
             if (snapshot.exists()) {
               setAllNotes(snapshot.val());
-              console.log('note: ' + snapshot.val())
-              
+              // console.log('note: ' + snapshot.val())
             } else {
-              console.log("Nessun dato disponibile");
+              // console.log("Nessun dato disponibile");
               setAllNotes([]);
             }
           }).catch((error) => {
@@ -29,9 +30,18 @@ export default function AppState() {
           });
     }
 
-    const [note, setNote] = useState([]);
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          if(user){
+              prendiNote();
+              setUserId(auth.currentUser.uid)
+          }
+        });
+  
+        return unsubscribe; // Questo è il cleanup per rimuovere il listener
+      }, [userLoaded]);
 
-    const StatiGlobali = {
+      const StatiGlobali = {
         allNotes,
         setAllNotes,
         note,
@@ -39,17 +49,10 @@ export default function AppState() {
         prendiNote,
         userLoaded,
         setUserLoaded,
+        userId,
+        setUserId
     };
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-          if(user){
-              prendiNote();
-          }
-        });
-  
-        return unsubscribe; // Questo è il cleanup per rimuovere il listener
-      }, [userLoaded]);
 
     return <AppNavigation StatiGlobali={StatiGlobali} />
 }

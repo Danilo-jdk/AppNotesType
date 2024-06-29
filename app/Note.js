@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
@@ -10,7 +10,9 @@ export default function Note (props) {
         <ThemedView style={styles.container}>
             <ThemedView style={styles.containerNota}>
                 <ThemedText style={styles.containerNota.titolo}>{note.titolo}</ThemedText>
-                <ThemedText style={styles.containerNota.testo}>{note.testo}</ThemedText>
+                <ScrollView>
+                    <ThemedText style={styles.containerNota.testo}>{note.testo}</ThemedText>
+                </ScrollView>
             </ThemedView>
             <TouchableOpacity style={styles.tornaIndietro} onPress={() => props.navigation.navigate('Home')}>
                 <ThemedText style={styles.tornaIndietro.testo}>Torna indietro</ThemedText>

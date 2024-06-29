@@ -2,9 +2,16 @@ import React, {useState, useEffect} from "react";
 import { StyleSheet, TouchableOpacity, ScrollView, Platform} from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { FontAwesome5 } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
+import CustomModal from "./components/CustomModal";
+
+import { getDatabase, ref, remove } from "firebase/database";
 
 export default function Home(props) {
-    const {allNotes, setNote} = props.StatiGlobali;
+    const {allNotes, setNote, userId, prendiNote} = props.StatiGlobali;
+    const [modalVisible, setModalVisible] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     const handlePress = (nota) => {
         console.log('nota: ', nota);
@@ -17,20 +24,66 @@ export default function Home(props) {
         return b.data - a.data; // Ordine decrescente: dalla più recente alla più vecchia
     });
 
+    const deleteItem = (id, titolo) => {
+        const notaDaEliminare = {id: id, titolo: titolo};
+        setItemToDelete(notaDaEliminare);
+        setModalVisible(true)
+    }
+
+    const confirmDeleteItem = (itemId) => {
+        setModalVisible(false);
+        removeNote(itemId);
+    }
+
+    const removeNote = (itemId) => {
+        const db = getDatabase();
+        const notaRef = ref(db, 'users/' + userId + '/notes/' + itemId);
+
+        remove(notaRef)
+            .then(() => {
+                console.log('nota rimossa con successo');
+                prendiNote();
+            })
+            .catch((error) => {
+                console.error("errore nella rimozione nota")
+            })
+    }
+
     return (
         <>
           {notesArray.length > 0 ? (
                     <ScrollView style={styles.scroll}>
                            <ThemedView style={styles.container}>
                            { notesArray.map((nota, index) => (
+                            
                                 <ThemedView style={styles.containerNota} key={index}>
+
+                                    <ThemedView style={styles.containerBtnUpdate}>
+                                        <TouchableOpacity onPress={() => null}>
+                                            <FontAwesome5 name="pen" size={20} color="black" />
+                                        </TouchableOpacity>
+                                    </ThemedView>
+
                                     <TouchableOpacity onPress={() => handlePress(nota)}>
                                         <ThemedText style={styles.containerNota.titolo}>{nota.titolo}</ThemedText>
                                         <ThemedText style={styles.containerNota.testo}>{nota.testo}</ThemedText>
                                     </TouchableOpacity>
+
+                                    <ThemedView style={styles.containerBtnDelete}>
+                                        <TouchableOpacity onPress={() => deleteItem(nota.id, nota.titolo)}>
+                                            <Feather name="trash-2" size={20} color="black" />
+                                        </TouchableOpacity>
+                                    </ThemedView>
+
                                 </ThemedView>
                             )) }
                             </ThemedView>
+                            <CustomModal 
+                                isVisible={modalVisible}
+                                onConfirm={confirmDeleteItem}
+                                onCancel={() => setModalVisible(false)}
+                                item={itemToDelete}
+                            />
                     </ScrollView>
                     ) : (
                         <ThemedView style={styles.centro}>
@@ -102,8 +155,25 @@ const styles = StyleSheet.create({
         testo: {
             fontSize: 12,
             textAlign: 'justify',
-            marginTop: 10,
-            color: 'black'
-        }
+            marginTop: 3,
+            color: 'black',
+            height: 148,
+            width: '98%',
+        },
+    },
+    containerBtnUpdate: {
+        alignItems:'flex-end',
+        backgroundColor: null,
+        position: 'absolute',
+        right:10,
+        top: 10
+    },
+    containerBtnDelete: {
+        alignItems:'flex-end',
+        backgroundColor: null,
+        position: 'absolute',
+        right:10,
+        bottom: 10,
+      
     }
 })

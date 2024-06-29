@@ -3,7 +3,7 @@ import { Modal, TouchableOpacity, StyleSheet } from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-const LogoutModal = ({isVisible, onConfirm, onCancel }) => {
+const CustomModal = ({isVisible, onConfirm, onCancel, item }) => {
     return (
         <Modal 
         animationType="fade"
@@ -13,13 +13,13 @@ const LogoutModal = ({isVisible, onConfirm, onCancel }) => {
         >
             <ThemedView style={styles.centeredView}>
                 <ThemedView style={styles.modalView}>
-                    <ThemedText>Sei sicuro di voler uscire dall'app?</ThemedText>
+                    <ThemedText>{item?.titolo ? 'Sei sicuro di voler eliminare la seguente nota: "' + item?.titolo + '"': "Sei sicuro di voler uscire dall'app"} ?</ThemedText>
                     <ThemedView style={styles.btnContainer}>
                         <TouchableOpacity style={[styles.btn, styles.btnCancel]} onPress={onCancel}>
                             <ThemedText style={styles.textStyle}>ANNULLA</ThemedText>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.btn, styles.btnConfirm]} onPress={onConfirm}>
-                            <ThemedText style={styles.textStyle}>ESCI</ThemedText>
+                        <TouchableOpacity style={[styles.btn, styles.btnConfirm]} onPress={item?.titolo ? () => onConfirm(item.id) : onConfirm}>
+                            <ThemedText style={styles.textStyle}>{item?.titolo ? 'ELIMINA' : "ESCI"}</ThemedText>
                         </TouchableOpacity>
                     </ThemedView>
                 </ThemedView>
@@ -29,7 +29,7 @@ const LogoutModal = ({isVisible, onConfirm, onCancel }) => {
     )
 }
 
-export default LogoutModal;
+export default CustomModal;
 
 const styles = StyleSheet.create({
     centeredView: {
