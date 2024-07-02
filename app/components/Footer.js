@@ -5,8 +5,10 @@ import { ThemedView } from '@/components/ThemedView';
 import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import IconFont from 'react-native-vector-icons/FontAwesome6';
-export default function Footer() {
+export default function Footer(props) {
     const navigation = useNavigation();
+
+    const { isOffline } = props.StatiGlobali;
 
     return (
         <ThemedView style={styles.footer}>
@@ -14,10 +16,12 @@ export default function Footer() {
                 <Icon name='home' size={30} color='#000' />
                 <ThemedText style={styles.text}>home</ThemedText>
             </TouchableOpacity>
+            {!isOffline && (
             <TouchableOpacity onPress={() => navigation.navigate('CreateNote')} style={styles.contenitore}>
                 <IconFont name='notes-medical' size={30} color='#000' />
                 <ThemedText style={styles.text}>crea nota</ThemedText>
             </TouchableOpacity>
+            )}
         </ThemedView>
     )
 }

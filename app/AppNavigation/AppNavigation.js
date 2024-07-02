@@ -13,6 +13,7 @@ import Header from '../components/Header';
 import Home from '../Home';
 import Note from '../Note';
 import CreateNote from '../CreateNote';
+import ModifyNote from '../ModifyNote';
 import Login from '../Login';
 
 const Stack = createNativeStackNavigator();
@@ -45,8 +46,11 @@ export default function AppNavigation({StatiGlobali}) {
                                 <Stack.Screen name='CreateNote'>
                                     { (props) => <CreateNote {...props} StatiGlobali={StatiGlobali} /> }
                                 </Stack.Screen>
+                                <Stack.Screen name='ModifyNote'>
+                                    { (props) => <ModifyNote {...props} StatiGlobali={StatiGlobali} /> }
+                                </Stack.Screen>
                             </Stack.Navigator>
-                            <Footer />
+                            <Footer StatiGlobali={StatiGlobali}/>
                         </>
                 ) : (
                         <Stack.Navigator screenOptions={{ headerShown: false}}>

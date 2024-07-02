@@ -1,13 +1,14 @@
 import React, {useState, useEffect} from "react";
-import { StyleSheet, TouchableOpacity, TextInput, Alert, TouchableWithoutFeedback, Keyboard, } from "react-native";
+import { StyleSheet, TouchableOpacity, TextInput, Alert, Keyboard, Linking, TouchableWithoutFeedback} from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { auth } from "./firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getDatabase, ref, set} from 'firebase/database';
 
-import { Ionicons } from "@expo/vector-icons";
+import Checkbox from 'expo-checkbox';
 
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Login({ StatiGlobali }) {
     const [nome, setNome] = useState("");
@@ -15,6 +16,7 @@ export default function Login({ StatiGlobali }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [ripetiPassword, setRipetiPassword] = useState("");
+    const [isChecked, setIsChecked] = useState(false);
 
     const { setUserLoaded } = StatiGlobali;
 
@@ -83,8 +85,21 @@ export default function Login({ StatiGlobali }) {
             })
     }
 
+    const openTerms = () => {
+        const url = 'https://www.google.com';
+        Linking.canOpenURL(url)
+        .then((supported) => {
+            console.log()
+            if(supported) {
+                Linking.openURL(url);
+            } else {
+                console.log('impossibile aprire url' + url)
+            }
+        })
+    }
+
     useEffect(() => {
-        if(nome !== '' && cognome !== '' && email !== '' && password !== '') {
+        if(nome !== '' && cognome !== '' && email !== '' && password !== '' && isChecked) {
             if(!isValidEmail(email)) {
                 console.log('la mail inserita non è valida');
                 setErrorMessage('la mail inserita non è valida');
@@ -109,7 +124,7 @@ export default function Login({ StatiGlobali }) {
             console.log('pulsante disabilitato a causa di errori');
             setIsButtonEnabled(false)
         }
-    }, [nome, cognome, email, password, ripetiPassword]);
+    }, [nome, cognome, email, password, ripetiPassword, isChecked]);
 
     const dismissKeyboard = () => {
         Keyboard.dismiss();
@@ -133,6 +148,8 @@ export default function Login({ StatiGlobali }) {
                             value={cognome}
                             onChangeText={setCognome}
                         />
+
+
                     </>
                  )}
            
@@ -151,11 +168,13 @@ export default function Login({ StatiGlobali }) {
                             secureTextEntry = {!passwordVisible}
                         />
                         <TouchableOpacity style={styles.iconEye} onPress={() => setPasswordVisible(!passwordVisible)}>
-                            <Ionicons name={passwordVisible ? 'eye' : 'eye-off'} size={24} color='gray' />
+                            <Ionicons name={passwordVisible ? 'eye' : 'eye-off'} size={24} color='grey' />
                         </TouchableOpacity>
                  </ThemedView>
+
                  {registrazione && (
-                    <ThemedView style={styles.containerPassword}>
+                    <>
+                     <ThemedView style={styles.containerPassword}>
                                 <TextInput
                                     style={styles.inputPassword}
                                     placeholder="Ripeti Password"
@@ -166,14 +185,29 @@ export default function Login({ StatiGlobali }) {
                                 {/* <TouchableOpacity style={styles.iconEye} onPress={() => setPasswordVisible(!passwordVisible)}>
                                     <Ionicons name={passwordVisible ? 'eye' : 'eye-off'} size={24} color='gray' />
                                 </TouchableOpacity> */}
+                                
                     </ThemedView>
+                        <ThemedView style={styles.containerPrivacy}>
+                            <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setIsChecked} color={'grey'} />
+                            <ThemedText style={styles.containerTesti}>Accetto i 
+                                <TouchableWithoutFeedback onPress={openTerms} >
+                                    <ThemedText style={[styles.frase, styles.link]}> termini</ThemedText>
+                                </TouchableWithoutFeedback> di utilizzo
+                            </ThemedText>
+                        </ThemedView>
+                    </>
+      
                  )}
                 {!registrazione && (
                     <>
                         <TouchableOpacity style={styles.btn} onPress={handleSignIn}>
                             <ThemedText style={styles.btn.testo}>Accedi</ThemedText>
                         </TouchableOpacity>
-                        <ThemedText style={styles.frase}>Se non sei registrato, clicca qui per <TouchableOpacity onPress={() => setRegistrazione(true)}><ThemedText style={[styles.frase, styles.link]}>registrarti</ThemedText></TouchableOpacity></ThemedText>
+                        <ThemedText style={styles.frase}>Se non sei registrato, clicca qui per 
+                            <TouchableWithoutFeedback onPress={() => setRegistrazione(true)}>
+                                <ThemedText style={[styles.frase, styles.link]}> registrarti</ThemedText>
+                            </TouchableWithoutFeedback>
+                        </ThemedText>
                     </>
                 )}
                 {registrazione && (
@@ -181,10 +215,10 @@ export default function Login({ StatiGlobali }) {
                         <ThemedText>
                             {errorMessage}
                         </ThemedText>
-                        <TouchableOpacity style={[styles.btn, {opacity: isButtonEnabled ? 1 : 0.3}]} onPress={handleCreateAccount} disabled={!isButtonEnabled}>
+                        <TouchableWithoutFeedback style={[styles.btn, {opacity: isButtonEnabled ? 1 : 0.3}]} onPress={handleCreateAccount} disabled={!isButtonEnabled}>
                             <ThemedText style={styles.btn.testo}>Registrati</ThemedText>
-                        </TouchableOpacity>
-                        <ThemedText style={styles.frase}>Se sei già registrato, clicca qui per <TouchableOpacity onPress={() => setRegistrazione(false)}><ThemedText style={[styles.frase, styles.link]}>accedere</ThemedText></TouchableOpacity></ThemedText>
+                        </TouchableWithoutFeedback>
+                        <ThemedText style={styles.frase}>Se sei già registrato, clicca qui per <TouchableWithoutFeedback onPress={() => setRegistrazione(false)}><ThemedText style={[styles.frase, styles.link]}>accedere</ThemedText></TouchableWithoutFeedback></ThemedText>
                     </>
                 )}
                 </ThemedView>
@@ -226,6 +260,19 @@ const styles = StyleSheet.create({
         width: '100%'
     },
 
+    containerPrivacy: {
+        backgroundColor: null,
+        flexDirection:'row',
+        alignItems: 'baseline',
+        alignContent:'flex-end',
+
+    },
+
+    checkbox:{
+        marginTop:10,
+        marginRight:10
+    },
+
     btn: {
         alignItems: 'center',
         marginTop: 30,
@@ -241,9 +288,15 @@ const styles = StyleSheet.create({
         fontSize:14,
         alignSelf:'center'
     },
+    containerTesti: {
+        flexDirection: 'row',
+       position:'relative',
+       top:-4
+
+    },
     link:{
         fontWeight:'bold', 
-        marginTop:3
+       borderWidth:0,
     },
     containerPassword: {
         flexDirection: 'row',

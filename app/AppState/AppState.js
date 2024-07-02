@@ -5,12 +5,18 @@ import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getDatabase, ref, get } from "firebase/database";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import NetInfo from "@react-native-community/netinfo";
+
 
 export default function AppState() {
     const [allNotes, setAllNotes] = useState([]);
     const [userLoaded, setUserLoaded] = useState(false);
     const [userId, setUserId] = useState(null);
     const [note, setNote] = useState([]);
+
+    const [isOffline, setIsOffline] = useState(false);
 
     const prendiNote = () => {
         const db = getDatabase();
@@ -19,8 +25,9 @@ export default function AppState() {
 
         get(userRef).then((snapshot) => {
             if (snapshot.exists()) {
-              setAllNotes(snapshot.val());
+              //setAllNotes(snapshot.val());
               // console.log('note: ' + snapshot.val())
+              salvaNoteLocalmente(snapshot.val())
             } else {
               // console.log("Nessun dato disponibile");
               setAllNotes([]);
@@ -28,6 +35,28 @@ export default function AppState() {
           }).catch((error) => {
             console.error(error);
           });
+    }
+
+    const salvaNoteLocalmente = async (note) => {
+      try {
+        const noteJson = JSON.stringify(note);
+        await AsyncStorage.setItem('noteLocali', noteJson);
+        caricaNoteLocali();
+      } catch (error) {
+        console.log('errore nel salvataggio delle note in locale')
+      }
+    }
+
+    const caricaNoteLocali = async () => {
+      try {
+        const noteJson = await AsyncStorage.getItem('noteLocali');
+        if(noteJson !== null) {
+          const note = JSON.parse(noteJson);
+          setAllNotes(note);
+        }
+      } catch (error) {
+        console.log('errore nel caricamento delle note in locale')
+      }
     }
 
     useEffect(() => {
@@ -41,6 +70,13 @@ export default function AppState() {
         return unsubscribe; // Questo è il cleanup per rimuovere il listener
       }, [userLoaded]);
 
+      useEffect(() => {
+        const unsubscribeOffline = NetInfo.addEventListener( state => {
+          setIsOffline(state.isConnected === false)
+        });
+        return () => unsubscribeOffline();
+      }, []);
+
       const StatiGlobali = {
         allNotes,
         setAllNotes,
@@ -50,7 +86,8 @@ export default function AppState() {
         userLoaded,
         setUserLoaded,
         userId,
-        setUserId
+        setUserId,
+        isOffline
     };
 
 

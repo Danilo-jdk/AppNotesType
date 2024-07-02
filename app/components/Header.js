@@ -93,9 +93,10 @@ export default function Header({StatiGlobali}) {
 const styles = StyleSheet.create({
     header: {
         backgroundColor: 'yellow',
-        height: 60,
+        height: 60 ,
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth:0
     },
     title: {
         fontSize: 30,
