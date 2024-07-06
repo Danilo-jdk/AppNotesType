@@ -67,6 +67,7 @@ export default function Header({StatiGlobali}) {
             })
     }
 
+
     return (
         <ThemedView style={[styles.shadowWrapper, styles.bordo]}>
             <ThemedView style={[styles.header, ]}>

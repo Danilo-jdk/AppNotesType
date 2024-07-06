@@ -8,6 +8,9 @@ import CustomModal from "./components/CustomModal";
 
 import { getDatabase, ref, remove } from "firebase/database";
 
+import {  ref as storageRef, deleteObject } from "firebase/storage";
+import { storage, auth } from "./firebase";
+
 export default function Home(props) {
     const {allNotes, setNote, userId, prendiNote, isOffline} = props.StatiGlobali;
     const [modalVisible, setModalVisible] = useState(false);
@@ -16,6 +19,8 @@ export default function Home(props) {
     const [vis, setVis] = useState(false)
 
     const imgOffline = '../assets/images/offline.png';
+
+    const [user, setUser] = useState(null)
 
     const handlePress = (nota) => {
         console.log('nota: ', nota);
@@ -28,15 +33,18 @@ export default function Home(props) {
         return b.data - a.data; // Ordine decrescente: dalla più recente alla più vecchia
     });
 
-    const deleteItem = (id, titolo) => {
-        const notaDaEliminare = {id: id, titolo: titolo};
+    const deleteItem = (id, titolo, imageUrl) => {
+        console.log('deleteItem ' +  imageUrl)
+        const notaDaEliminare = {id: id, titolo: titolo, imageUrl: imageUrl};
         setItemToDelete(notaDaEliminare);
         setModalVisible(true)
     }
 
-    const confirmDeleteItem = (itemId) => {
+    const confirmDeleteItem = (item) => {
         setModalVisible(false);
-        removeNote(itemId);
+        console.log('confirmDeleteItem ' +  item.imageUrl)
+       deleteImage(item.imageUrl)
+       removeNote(item.id);
     }
 
     const removeNote = (itemId) => {
@@ -53,6 +61,23 @@ export default function Home(props) {
             })
     }
 
+
+    const deleteImage = async (noteImageUrl) => {
+        try {
+            //const path = decodeURIComponent(noteImageUrl.split('/o/')[1].split('?')[0]);
+            const imageRef = storageRef(storage, noteImageUrl);
+            await deleteObject(imageRef);
+            console.log('immagine eliminata');
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        let user = auth.currentUser;
+        setUser(user);
+        console.log('utente,' + user)
+    })
     return (
         <>
           {notesArray.length > 0 ? (
@@ -83,13 +108,16 @@ export default function Home(props) {
                                      )}
 
                                     <TouchableOpacity onPress={() => handlePress(nota)} style={styles.containerCorpoNota}>
+                                        {nota.imageUrl && (
+                                            <Image source={{ uri: nota.imageUrl }} style={styles.image} />
+                                        )}
                                         <ThemedText style={styles.containerNota.titolo}>{nota.titolo}</ThemedText>
                                         <ThemedText style={styles.containerNota.testo}>{nota.testo}</ThemedText>
                                     </TouchableOpacity>
 
                                     {!isOffline && (
                                     <ThemedView style={styles.containerBtnDelete}>
-                                        <TouchableOpacity onPress={() => deleteItem(nota.id, nota.titolo)}>
+                                        <TouchableOpacity onPress={() => deleteItem(nota.id, nota.titolo, nota.imageUrl)}>
                                             <Feather name="trash-2" size={20} color="black" />
                                         </TouchableOpacity>
                                     </ThemedView>
@@ -163,7 +191,7 @@ const styles = StyleSheet.create({
     containerNota: {
         backgroundColor: "rgb(255, 251, 180)",
         width: '90%',
-        height: 200,
+        minHeight: 200,
         padding:20,
         shadowColor: "#000",
         shadowOffset: {
@@ -205,5 +233,11 @@ const styles = StyleSheet.create({
         right:10,
         bottom: 10,
       
+    },
+    image: {
+        width: '100%',
+        height: 150,
+        resizeMode: 'cover'
     }
+
 })

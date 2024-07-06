@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { StyleSheet, TouchableOpacity, ScrollView, Image} from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
@@ -9,6 +9,9 @@ export default function Note (props) {
     return (
         <ThemedView style={styles.container}>
             <ThemedView style={styles.containerNota}>
+            {note.imageUrl && (
+                 <Image source={{ uri: note.imageUrl }} style={styles.image} />
+             )}
                 <ThemedText style={styles.containerNota.titolo}>{note.titolo}</ThemedText>
                 <ScrollView>
                     <ThemedText style={styles.containerNota.testo}>{note.testo}</ThemedText>
@@ -49,7 +52,7 @@ const styles = StyleSheet.create({
     containerNota: {
         backgroundColor: "rgb(255, 251, 180)",
         width: '90%',
-        height: 400,
+        minHeight: 400,
         padding:20,
         shadowColor: "#000",
         shadowOffset: {
@@ -77,5 +80,10 @@ const styles = StyleSheet.create({
         testo: {
             fontWeight: '700'
         }
+    },
+    image: {
+        width: '100%',
+        height: 300,
+        resizeMode: 'contain'
     }
 })

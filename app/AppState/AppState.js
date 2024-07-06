@@ -87,7 +87,7 @@ export default function AppState() {
         setUserLoaded,
         userId,
         setUserId,
-        isOffline
+        isOffline,
     };
 
 

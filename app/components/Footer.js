@@ -22,6 +22,10 @@ export default function Footer(props) {
                 <ThemedText style={styles.text}>crea nota</ThemedText>
             </TouchableOpacity>
             )}
+              <TouchableOpacity onPress={() => navigation.navigate('DeleteUser')} style={styles.contenitore}>
+                <Icon name='home' size={30} color='#000' />
+                <ThemedText style={styles.text}>Delete</ThemedText>
+            </TouchableOpacity>
         </ThemedView>
     )
 }

@@ -1,14 +1,20 @@
 import React, {useState, useEffect} from "react";
-import { StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import { StyleSheet, TouchableOpacity, TextInput, Image } from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { getDatabase, ref, set, push } from "firebase/database";
+
+import * as ImagePicker from 'expo-image-picker';
+import { getDownloadURL, ref as storageRef, uploadBytes, deleteObject } from "firebase/storage";
+import { storage } from "./firebase";
 
 export default function CreateNote (props) {
     const { note, userId, prendiNote } = props.StatiGlobali;
 
     const [titolo, setTitolo] = useState('');
     const [testo, setTesto] = useState('');
+
+    const [imageUrl, setImageUrl ] = useState(null);
 
     const saveNote = async () => {
         try {
@@ -20,6 +26,7 @@ export default function CreateNote (props) {
                 id:newNotesRef.key.toString(),
                 titolo: titolo,
                 testo: testo,
+                imageUrl: imageUrl,
                 data: Date.now()
             };
             set(newNotesRef, body )
@@ -33,6 +40,46 @@ export default function CreateNote (props) {
             })
         } catch (error) {
             console.log("errore salvataggio: ", error)
+        }
+    }
+
+    const selectImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 0.5,
+            // aspect: [1,1]
+        });
+        if (!result.canceled){
+            const source = { uri: result.assets[0].uri };
+            uploadImage(source.uri);
+        }
+    }
+
+    const uploadImage = async (uri) => {
+        try {
+            const response = await fetch(uri);
+            const blob = await response.blob();
+            const filename = uri.substring(uri.lastIndexOf('/') + 1);
+            const storageReference = storageRef(storage, `images/${filename}`);
+            await uploadBytes(storageReference, blob);
+
+            const url = await getDownloadURL(storageReference);
+            setImageUrl(url);
+            console.log('foto caricata con successo: ', url)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const deleteImage = async (noteImageUrl) => {
+        try {
+            const imageRef = storageRef(storage, noteImageUrl);
+            await deleteObject(imageRef);
+            console.log('immagine eliminata');
+            setImageUrl(null)
+        } catch (error) {
+            console.error(error)
         }
     }
 
@@ -53,6 +100,21 @@ export default function CreateNote (props) {
                     onChangeText={setTesto}
                     multiline={true}
                 />
+                {!imageUrl && (
+                <TouchableOpacity style={styles.btn} onPress={selectImage}>
+                    <ThemedText style={styles.btn.testo}>SELEZIONA IMMAGINE</ThemedText>
+                </TouchableOpacity>
+                )}
+                {imageUrl && (
+                   <>
+                     <ThemedView style={styles.imagePreview}>
+                        <Image source={{ uri: imageUrl }} style={styles.image} />
+                    </ThemedView>
+                    <TouchableOpacity style={styles.btn} onPress={() => deleteImage(imageUrl)}>
+                        <ThemedText style={styles.btnTesto}>ELIMINA FOTO</ThemedText>
+                    </TouchableOpacity>
+                   </>
+                )}
                 <TouchableOpacity style={styles.btn} onPress={saveNote}>
                     <ThemedText style={styles.btn.testo}>INSERISCI NOTA</ThemedText>
                 </TouchableOpacity>
@@ -133,10 +195,21 @@ const styles = StyleSheet.create({
 
     btn: {
         alignItems: 'center',
-        marginTop: 20
-,        testo: {
+        marginTop: 20,
+        testo: {
 
         }
+    },
+    imagePreview: {
+        marginTop: 10,
+        alignItems: 'center',
+        height: 200,
+        backgroundColor: null
+    },
+    image: {
+        width: '100%',
+        height: 150,
+        resizeMode: 'cover'
     }
 
 })

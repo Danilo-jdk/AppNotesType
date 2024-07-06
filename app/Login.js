@@ -215,9 +215,9 @@ export default function Login({ StatiGlobali }) {
                         <ThemedText>
                             {errorMessage}
                         </ThemedText>
-                        <TouchableWithoutFeedback style={[styles.btn, {opacity: isButtonEnabled ? 1 : 0.3}]} onPress={handleCreateAccount} disabled={!isButtonEnabled}>
+                        <TouchableOpacity style={[styles.btn, {opacity: isButtonEnabled ? 1 : 0.3}]} onPress={handleCreateAccount} disabled={!isButtonEnabled}>
                             <ThemedText style={styles.btn.testo}>Registrati</ThemedText>
-                        </TouchableWithoutFeedback>
+                        </TouchableOpacity>
                         <ThemedText style={styles.frase}>Se sei già registrato, clicca qui per <TouchableWithoutFeedback onPress={() => setRegistrazione(false)}><ThemedText style={[styles.frase, styles.link]}>accedere</ThemedText></TouchableWithoutFeedback></ThemedText>
                     </>
                 )}

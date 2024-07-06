@@ -18,7 +18,7 @@ const CustomModal = ({isVisible, onConfirm, onCancel, item }) => {
                         <TouchableOpacity style={[styles.btn, styles.btnCancel]} onPress={onCancel}>
                             <ThemedText style={styles.textStyle}>ANNULLA</ThemedText>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.btn, styles.btnConfirm]} onPress={item?.titolo ? () => onConfirm(item.id) : onConfirm}>
+                        <TouchableOpacity style={[styles.btn, styles.btnConfirm]} onPress={item?.titolo ? () => onConfirm(item) : onConfirm}>
                             <ThemedText style={styles.textStyle}>{item?.titolo ? 'ELIMINA' : "ESCI"}</ThemedText>
                         </TouchableOpacity>
                     </ThemedView>
