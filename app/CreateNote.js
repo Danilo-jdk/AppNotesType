@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { StyleSheet, TouchableOpacity, TextInput, Image } from "react-native";
+import { StyleSheet, TouchableOpacity, TextInput, Image, ActivityIndicator } from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { getDatabase, ref, set, push } from "firebase/database";
@@ -15,6 +15,8 @@ export default function CreateNote (props) {
     const [testo, setTesto] = useState('');
 
     const [imageUrl, setImageUrl ] = useState(null);
+
+    const [isLoading, setIsLoading] = useState(false)
 
     const saveNote = async () => {
         try {
@@ -51,6 +53,7 @@ export default function CreateNote (props) {
             // aspect: [1,1]
         });
         if (!result.canceled){
+            setIsLoading(true)
             const source = { uri: result.assets[0].uri };
             uploadImage(source.uri);
         }
@@ -66,7 +69,8 @@ export default function CreateNote (props) {
 
             const url = await getDownloadURL(storageReference);
             setImageUrl(url);
-            console.log('foto caricata con successo: ', url)
+            console.log('foto caricata con successo: ', url);
+            setIsLoading(false)
         } catch (error) {
             console.error(error)
         }
@@ -100,12 +104,15 @@ export default function CreateNote (props) {
                     onChangeText={setTesto}
                     multiline={true}
                 />
-                {!imageUrl && (
+                {!imageUrl  && !isLoading && (
                 <TouchableOpacity style={styles.btn} onPress={selectImage}>
                     <ThemedText style={styles.btn.testo}>SELEZIONA IMMAGINE</ThemedText>
                 </TouchableOpacity>
                 )}
-                {imageUrl && (
+                {isLoading && (
+                    <ActivityIndicator size='large' />
+                )}
+                {imageUrl && !isLoading && (
                    <>
                      <ThemedView style={styles.imagePreview}>
                         <Image source={{ uri: imageUrl }} style={styles.image} />

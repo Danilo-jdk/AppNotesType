@@ -16,6 +16,7 @@ import CreateNote from '../CreateNote';
 import ModifyNote from '../ModifyNote';
 import Login from '../Login';
 import DeleteUser from '../DeleteUser';
+import AskBot from '../AskBot';
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +53,9 @@ export default function AppNavigation({StatiGlobali}) {
                                 </Stack.Screen>
                                 <Stack.Screen name='DeleteUser'>
                                     { (props) => <DeleteUser {...props} StatiGlobali={StatiGlobali} /> }
+                                </Stack.Screen>
+                                <Stack.Screen name='AskBot'>
+                                    { (props) => <AskBot {...props} StatiGlobali={StatiGlobali} /> }
                                 </Stack.Screen>
                             </Stack.Navigator>
                             <Footer StatiGlobali={StatiGlobali}/>
