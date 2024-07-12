@@ -24,7 +24,7 @@ const openAIUrl = 'https://api.openai.com/v1/chat/completions';
         console.log('sei nel try di chatGpt');
         const response = await  axios.post(openAIUrl, body, {
             headers: {
-                'Authorization': 'API KEY'
+                'Authorization': ''
             }
         });
         console.log('risposta da chat: ', response.data);
