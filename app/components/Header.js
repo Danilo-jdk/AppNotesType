@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomModal from './CustomModal';
 
 export default function Header({StatiGlobali}) {
-    const logo = '../..//images/logo_app_notes.png';
+    const logo = '../../assets/images/logo_app_notes.png';
     const { userLoaded } = StatiGlobali;
 
     const [user, setUser] = useState(null);
