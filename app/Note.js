@@ -1,10 +1,19 @@
 import React, {useState, useEffect} from "react";
-import { StyleSheet, TouchableOpacity, ScrollView, Image} from "react-native";
+import { StyleSheet, TouchableOpacity, ScrollView, Image, Share} from "react-native";
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Note (props) {
     const { note } = props.StatiGlobali;
+
+    const shareNote = async (note) => {
+        const message = `${note.imageUrl}\n${note.titolo}\n${note.testo}`;
+
+        Share.share({
+            message: message,
+        }, {dialogTitle: 'Condividi Nota'})
+    }
 
     return (
         <ThemedView style={styles.container}>
@@ -12,7 +21,12 @@ export default function Note (props) {
             {note.imageUrl && (
                  <Image source={{ uri: note.imageUrl }} style={styles.image} />
              )}
-                <ThemedText style={styles.containerNota.titolo}>{note.titolo}</ThemedText>
+                <ThemedView style={styles.containerShare}>
+                    <ThemedText style={styles.containerNota.titolo}>{note.titolo}</ThemedText>
+                    <TouchableOpacity onPress={() => shareNote(note)}>
+                        <Ionicons name="share-social-sharp" size={25} color={'black'} />
+                    </TouchableOpacity>
+                </ThemedView>
                 <ScrollView>
                     <ThemedText style={styles.containerNota.testo}>{note.testo}</ThemedText>
                 </ScrollView>
@@ -85,5 +99,10 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 300,
         resizeMode: 'contain'
+    },
+    containerShare:{ 
+        backgroundColor: null,
+        flexDirection: "row",
+        justifyContent: 'space-between'
     }
 })
